@@ -86,7 +86,7 @@ class Loader
         $pckFile = dirname(dirname(__FILE__)).'/database/';
         if(!file_exists(getcwd() . '/database')) {
             shell_exec('cp -R ' . $pckFile . ' ' . getcwd() . '/database');
-            shell_exec('rm ' . $pckFile . ' ' . getcwd() . '/database/mappers/*');
+            // shell_exec('rm ' .  getcwd() . '/database/mappers/*');
         }
 
         echo PHP_EOL . ' You are ready to start ' . PHP_EOL;
