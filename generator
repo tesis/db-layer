@@ -1,0 +1,73 @@
+#!/usr/bin/env php
+<?php
+
+require_once __DIR__ . '/src/config/bootstrap.php';
+
+use Tesis\DBLayer\System\SqlGenerator;
+use Tesis\DBLayer\System\SqlGeneratorReader;
+
+$fh = fopen("php://stdin", "rb");
+echo ' Your saved configs: ' . PHP_EOL;
+print_r($config);
+
+
+// Test if databas connection is ok
+$gen = new SqlGenerator($conf);
+
+if($gen->conn->connect_errno !== 0) {
+    echo 'Seems your credentials are wrong! Please try again.' . PHP_EOL;
+    echo $gen->conn->connect_error . PHP_EOL;
+    exit();
+}
+
+$tables = $gen->checkTables();
+if(!$tables || $tables->num_rows === 0) {
+    echo 'Tables does not exist or you have an error: ' . $gen->error . PHP_EOL;
+    exit();
+}
+echo 'Number of tables to generate: ' . $tables->num_rows . PHP_EOL;
+
+
+echo "Your database connection is active." . PHP_EOL;
+echo "Do you want to proceed? y/n " . PHP_EOL;
+$answer = trim(fgets($fh));
+if($answer === 'n') {
+    echo 'Action is terminated.' . PHP_EOL;
+    exit;
+}
+
+
+$override = false;
+$mapperFilename = getcwd().'/database' . '/' . $conf['mapperDir'].'/'.$conf['mapperFile'].'.'.$conf['mapperType'];
+
+// echo 'Mapper filename: ' . $mapperFilename . PHP_EOL ;
+
+// Generate mapper
+echo ' Generating tables : ' . PHP_EOL;
+$tables = $gen->getAllTables($conf['mapperType']);
+print_r($gen->tables);
+//read new data for array
+if (file_exists($mapperFilename)) {
+    echo ' File exists: ' . $mapperFilename . PHP_EOL;
+
+    if($conf['mapperType'] === 'php') {
+        echo ' PHP mapper generated successfully: ';
+        $line = file('mappers/dbTablesMapper.php')[1];
+        echo $line = substr(trim($line), '2') . PHP_EOL;
+    }
+    if($conf['mapperType'] === 'json' || $conf['mapperType'] === '') {
+        echo ' JSON mapper generated successfully: ';
+        $line = json_decode(file_get_contents($mapperFilename));
+        echo  $line->meta->generated  . PHP_EOL;
+    }
+    if($conf['mapperType'] === 'ini') {
+        echo ' INI mapper generated successfully: ';
+        $line = file('mappers/dbTablesMapper.ini')[1];
+        echo $line = substr(trim($line), '1') . PHP_EOL;
+    }
+}
+
+echo PHP_EOL . '------------ mapper file: -----------------' . PHP_EOL;
+echo PHP_EOL . '  ' . $mapperFilename . PHP_EOL;
+echo PHP_EOL . '-------------------------------------------' . PHP_EOL;
+

@@ -1,0 +1,44 @@
+{
+    "name": "tesis/db-layer",
+    "description": "DB layers for mysqli extension and PDO class. When DB is created, sql-generator provide a mapper for DB tables. Simple migrations and seeders are provided. First step is to run migrator, where new DB will be created, tables will be migrated and seeded, and DB mapper will be created. At the end run generator to generate mappers.",
+    "keywords": [
+        "mysqli", "pdo", "sql-generator", "mapper", "wrapper"
+    ],
+    "homepage": "https://github.com/tesis/db-layer",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Tereza Simcic",
+            "email": "tereza.simcic@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+        "files": [
+            "src/helpers.php"
+        ],
+        "classmap": [
+          "src"
+        ],
+        "psr-4": {
+            "Tesis\\DBLayer\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PHPUnitTests\\": "tests/"
+        }
+    },
+    "require": {
+        "php" : ">=5.6.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.5"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}

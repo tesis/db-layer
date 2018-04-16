@@ -1,0 +1,35 @@
+<phpunit
+         backupGlobals="false"
+         backupStaticAttributes="false"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="false"
+         syntaxCheck="false"
+         testSuiteLoaderFile="PHPUnit_Runner_StandardTestSuiteLoader"
+         timeoutForSmallTests="1"
+         timeoutForMediumTests="10"
+         timeoutForLargeTests="60"
+         verbose="true"
+         bootstrap="tests/bootstrap.php"
+>
+    <testsuites>
+        <testsuite name="Test Suite for Development">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+    <groups>
+        <exclude>
+            <group>ignore</group>
+        </exclude>
+    </groups>
+
+    <php>
+        <ini name="error_log" value="tests/error.log" />
+        <const name="MAKE_IN_MEMORY_DB" value="yes" />
+    </php>
+
+</phpunit>
+

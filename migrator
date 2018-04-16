@@ -1,0 +1,102 @@
+#!/usr/bin/env php
+<?php
+
+define('APP_START', microtime(true));
+
+/*
+|--------------------------------------------------------------------------
+| Register The Auto Loader
+|--------------------------------------------------------------------------
+*/
+
+require_once __DIR__ . '/src/config/bootstrap.php';
+
+use Tesis\DBLayer\System\Migrations;
+
+$errors = [];
+if(empty($config)) {
+    die('config missing');
+}
+
+if(!file_exists(getcwd().'/database'. '/' . $config['mapperDir'])) {
+    mkdir(getcwd().'/database' . '/' . $config['mapperDir']);
+}
+
+// TODO - should be dynamic
+if(!file_exists(getcwd().'/database'. '/' .'migrations/migrations.php')) {
+    echo ' Migrations missing ' . PHP_EOL;
+    exit();
+}
+$migrationFile = getcwd().'/database'. '/' .'migrations/migrations.php';
+$seederFile = getcwd().'/database'. '/' .'seeders/seeders.php';
+
+
+$class = new Migrations($config);
+
+// TODO - remove (only for tests)
+$class->dropDatabase($config['dbName']);
+
+$class->createDatabase($config['dbName']);
+
+try {
+    $class->setDatabase($config['dbName']);
+} catch (Exception $e) {
+    echo ' Initialization failed: ' . $e->getMessage()  . PHP_EOL;
+    echo ' Config file: config/dblayer.php' . PHP_EOL;
+    debugLog($e->getMessage() .  ' ' . $e->getLine() . ' ' . $e->getFile());
+    return false;
+}
+
+
+echo 'Start configurations check, writing to ini file: ' . PHP_EOL;
+$msg = $class->compareConfigs($config);
+echo $msg . PHP_EOL;
+
+
+try {
+    // Migrate
+    echo 'Start migrating tables' . PHP_EOL;
+    $class->migrate($migrationFile);
+    echo "\tDONE" . PHP_EOL;
+
+    // Generate mapper
+    $tables = $class->generateMapper($config);
+    echo 'Start generating mapper: ' . PHP_EOL;
+    if(empty($tables)) {
+        echo ' Something went wrong ' . PHP_EOL;
+        return false;
+    }
+    echo "\tDONE. Tables in mapper: " . PHP_EOL;
+    $t = 1;
+    foreach ($tables as $table) {
+        echo "\t\t" .  $t . ' - ' . $table . PHP_EOL;
+        $t++;
+    }
+    if(!file_exists($seederFile)) {
+        echo 'Seeding file missing ' . PHP_EOL;
+        echo PHP_EOL . '---------------------------------------' . PHP_EOL;
+        echo PHP_EOL . '  DBLayer application is ready to use' . PHP_EOL;
+        echo PHP_EOL . '---------------------------------------' . PHP_EOL;
+        exit();
+    }
+    // Seed
+    try {
+        echo 'Start seeding tables' . PHP_EOL;
+        $count = $class->seed($seederFile);
+        echo "\tDONE. Number of new records: " . $count . PHP_EOL;
+    } catch (Exception $e) {
+        echo 'Seeding error: '. $e->getMessage() .PHP_EOL;
+        debugLog($e->getMessage() .  ' ' . $e->getLine() . ' ' . $e->getFile());
+    }
+
+} catch (Exception $e) {
+    echo 'Migration error: ' .  $e->getMessage() . '(check your credentials in config/dbLayer.php)' .PHP_EOL;
+    debugLog($e->getMessage() .  ' ' . $e->getLine() . ' ' . $e->getFile());
+    return false;
+}
+
+
+echo PHP_EOL . '---------------------------------------' . PHP_EOL;
+echo PHP_EOL . '  DBLayer application is ready to use' . PHP_EOL;
+echo PHP_EOL . '---------------------------------------' . PHP_EOL;
+

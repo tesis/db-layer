@@ -1,0 +1,24 @@
+#in project's root
+
+$ cat .gitignore
+
+*~     # no files with ending ~
+*.htc
+*.log
+*.sql
+*.zip
+*.lock
+#https://github.com/thephpleague/skeleton
+#git@github.com:tesis/skeleton.git
+
+
+mappers/
+vendor/
+slate/
+# database/
+tests/functional/
+
+env.ini
+.env.ini
+src/config/config.php
+tests/config.php

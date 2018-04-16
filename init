@@ -1,0 +1,141 @@
+#!/usr/bin/env php
+<?php
+
+require_once __DIR__ . '/src/config/bootstrap.php';
+
+use Tesis\DBLayer\System\SqlGenerator;
+use Tesis\DBLayer\System\SqlGeneratorReader;
+
+$fh = fopen("php://stdin", "rb");
+echo ' Your saved configs: ' . PHP_EOL;
+print_r($config);
+
+$filename = "config/dbLayer.php";
+$required = ['dbUser', 'dbPass', 'dbName'];
+echo PHP_EOL . 'Do you want to change them? (y/n)' . PHP_EOL;
+
+$answer = trim(fgets($fh));
+if($answer === 'y') {
+    $conf = [
+        'dbHost' => 'localhost',
+        'dbUser' => '',
+        'dbPass' => '',
+        'dbName' => '',
+        'dbCharset' => 'utf8',
+        'mapperDir' => 'mappers',
+        'mapperFile' => 'dbTablesMapper',
+        'mapperType' => 'php',
+        'contactEmail' => 'tereza.simcic@gmail.com',
+        'environment' => 'dev',
+        'debug' => true
+    ];
+    echo "Please make sure database user, password and name are not empty.". PHP_EOL;
+    echo "Enter host of your database:" . $conf['dbHost'] . PHP_EOL;
+    $host = trim(fgets($fh));
+    $conf['dbHost'] = $config['dbHost'];
+    if(!empty($host)) {
+        $conf['dbHost'] = $host;
+    }
+    echo "Enter user: " . PHP_EOL;
+    $user = trim(fgets($fh));
+    $conf['dbUser'] = $config['dbUser'];
+    if(!empty($user)) {
+        $conf['dbUser'] = $user;
+    }
+
+    echo "Enter password: " . PHP_EOL;
+    $pass = trim(fgets($fh));
+    $conf['dbPass'] = $config['dbPass'];
+    if(!empty($pass)) {
+        $conf['dbPass'] = $pass;
+    }
+
+    echo "Enter database name (required): " . PHP_EOL;
+    $dbName = trim(fgets($fh));
+    $conf['dbName'] = $config['dbName'];
+    if(!empty($dbName)) {
+        $conf['dbName'] = $dbName;
+    }
+
+    echo "Enter charset (optional): " . PHP_EOL;
+    $dbCharset = trim(fgets($fh));
+    $conf['dbCharset'] = $config['dbCharset'];
+    if(!empty($dbCharset)) {
+        $conf['dbCharset'] = $dbCharset;
+    }
+
+    foreach ($required as $req) {
+        if(!array_key_exists($req, $conf) || $conf[$req] === '') {
+            echo $req . ' is required! ' . PHP_EOL;
+
+            while(empty($conf['dbName'])) {
+                echo "Enter database name (required): " . PHP_EOL;
+                $conf['dbName'] = trim(fgets($fh));
+            }
+        }
+    }
+    echo 'Your credentials: ' . PHP_EOL;
+
+    print_r($conf);
+
+    include_once(__DIR__ . '/writeToPhpFile.php');
+
+} else {
+    echo ' Using your saved credentials: ' . PHP_EOL;
+    $conf = $config;
+}
+
+
+// Test if databas connection is ok
+$gen = new SqlGenerator($conf);
+
+if($gen->conn->connect_errno !== 0) {
+    echo 'Seems your credentials are wrong! Please try again.' . PHP_EOL;
+    echo $gen->conn->connect_error . PHP_EOL;
+    exit();
+}
+
+
+// Check if ini file exists
+$override = false;
+$filenameIni = getcwd().'/.env.ini';
+// echo 'filename: ' . $filenameIni . PHP_EOL ;
+
+if(file_exists($filenameIni)) {
+    echo $filenameIni. ' already exists: ' . PHP_EOL;
+    echo 'Do you want to override it? (y/n)? ';
+    $answer = trim(fgets($fh));
+    if($answer === 'y') {
+        // override ini file
+        $override = true;
+    }
+}
+
+// Write to INI file
+if(!file_exists($filenameIni) || $override === true) {
+    if($gen->writeIni($conf, $filenameIni)) {
+        echo 'Your .env.ini file is overriden ' . PHP_EOL;
+    }
+    echo PHP_EOL . "Credentials are written in ini file: " . $filenameIni  . PHP_EOL;
+}
+echo "You can change your credentials at any time:" . PHP_EOL .PHP_EOL;
+
+echo PHP_EOL . '------------ config file: -----------------' . PHP_EOL;
+echo PHP_EOL . '  ' . getcwd(). '/'.$filename . PHP_EOL;
+echo PHP_EOL . '-------------------------------------------' . PHP_EOL;
+
+echo PHP_EOL . '------------- ini file --------------------' . PHP_EOL;
+echo PHP_EOL . '  ' . $filenameIni . PHP_EOL;
+echo PHP_EOL . '-------------------------------------------' . PHP_EOL;
+
+echo PHP_EOL . ' If your database is ready to use, please run generator: ' . PHP_EOL;
+
+echo PHP_EOL . '-------------------------------------------' . PHP_EOL;
+echo PHP_EOL . '  $php DBLayer/generator' . PHP_EOL;
+echo PHP_EOL . '-------------------------------------------' . PHP_EOL;
+
+echo PHP_EOL . ' Otherwise feel free to use simple migrator, add table properties and run migrator: ' . PHP_EOL;
+
+echo PHP_EOL . '-------------------------------------------' . PHP_EOL;
+echo PHP_EOL . '  $php DBLayer/migrator' . PHP_EOL;
+echo PHP_EOL . '-------------------------------------------' . PHP_EOL;
