@@ -25,7 +25,7 @@ if($answer === 'y') {
         'mapperDir' => 'mappers',
         'mapperFile' => 'dbTablesMapper',
         'mapperType' => 'json',
-        'contactEmail' => 'tereza.simcic@gmail.com',
+        'contactEmail' => 'your_email',
         'environment' => 'dev',
         'debug' => true
     ];
