@@ -131,11 +131,11 @@ echo PHP_EOL . '-------------------------------------------' . PHP_EOL;
 echo PHP_EOL . ' If your database is ready to use, please run generator: ' . PHP_EOL;
 
 echo PHP_EOL . '-------------------------------------------' . PHP_EOL;
-echo PHP_EOL . '  $php DBLayer/generator' . PHP_EOL;
+echo PHP_EOL . '  $ php vendor/tesis/db-layer/generator' . PHP_EOL;
 echo PHP_EOL . '-------------------------------------------' . PHP_EOL;
 
 echo PHP_EOL . ' Otherwise feel free to use simple migrator, add table properties and run migrator: ' . PHP_EOL;
 
 echo PHP_EOL . '-------------------------------------------' . PHP_EOL;
-echo PHP_EOL . '  $php DBLayer/migrator' . PHP_EOL;
+echo PHP_EOL . '  $ php vendor/tesis/db-layer/migrator' . PHP_EOL;
 echo PHP_EOL . '-------------------------------------------' . PHP_EOL;
