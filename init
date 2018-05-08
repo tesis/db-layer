@@ -24,7 +24,7 @@ if($answer === 'y') {
         'dbCharset' => 'utf8',
         'mapperDir' => 'mappers',
         'mapperFile' => 'dbTablesMapper',
-        'mapperType' => 'php',
+        'mapperType' => 'json',
         'contactEmail' => 'tereza.simcic@gmail.com',
         'environment' => 'dev',
         'debug' => true
