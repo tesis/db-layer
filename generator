@@ -38,29 +38,29 @@ if($answer === 'n') {
 
 
 $override = false;
-$mapperFilename = getcwd().'/database' . '/' . $conf['mapperDir'].'/'.$conf['mapperFile'].'.'.$conf['mapperType'];
+$mapperFilename = getcwd().'/database' . '/' . $config['mapperDir'].'/'.$config['mapperFile'].'.'.$config['mapperType'];
 
 // echo 'Mapper filename: ' . $mapperFilename . PHP_EOL ;
 
 // Generate mapper
 echo ' Generating tables : ' . PHP_EOL;
-$tables = $gen->getAllTables($conf['mapperType']);
+$tables = $gen->getAllTables($config['mapperType']);
 print_r($gen->tables);
 //read new data for array
 if (file_exists($mapperFilename)) {
     echo ' File exists: ' . $mapperFilename . PHP_EOL;
 
-    if($conf['mapperType'] === 'php') {
+    if($config['mapperType'] === 'php') {
         echo ' PHP mapper generated successfully: ';
         $line = file('mappers/dbTablesMapper.php')[1];
         echo $line = substr(trim($line), '2') . PHP_EOL;
     }
-    if($conf['mapperType'] === 'json' || $conf['mapperType'] === '') {
+    if($config['mapperType'] === 'json' || $config['mapperType'] === '') {
         echo ' JSON mapper generated successfully: ';
         $line = json_decode(file_get_contents($mapperFilename));
         echo  $line->meta->generated  . PHP_EOL;
     }
-    if($conf['mapperType'] === 'ini') {
+    if($config['mapperType'] === 'ini') {
         echo ' INI mapper generated successfully: ';
         $line = file('mappers/dbTablesMapper.ini')[1];
         echo $line = substr(trim($line), '1') . PHP_EOL;
