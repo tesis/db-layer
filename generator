@@ -12,7 +12,7 @@ print_r($config);
 
 
 // Test if databas connection is ok
-$gen = new SqlGenerator($conf);
+$gen = new SqlGenerator($config);
 
 if($gen->conn->connect_errno !== 0) {
     echo 'Seems your credentials are wrong! Please try again.' . PHP_EOL;
