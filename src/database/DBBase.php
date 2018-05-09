@@ -361,6 +361,12 @@ abstract class DBBase
         if (!is_array($this->fields)) {
             throw new RuntimeException('Fields are not an array: ' . print_r($this->fields, true));
         }
+        
+        if(!empty($this->tableAI)) {
+            // PK and AI are always at position 0
+            // $k = array_search($this->tableAI, $this->tableFields);
+            unset($this->tableFields[0]);
+        }
 
         $missedFields = array_diff($this->tableFields, $this->fields);
         if(!empty($this->tableNull)) {
